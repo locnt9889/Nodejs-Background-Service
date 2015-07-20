@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/NodejsServiceBase.iml" filepath="$PROJECT_DIR$/.idea/NodejsServiceBase.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Nodejs-Background-Service.iml" filepath="$PROJECT_DIR$/.idea/Nodejs-Background-Service.iml" />
     </modules>
   </component>
 </project>
