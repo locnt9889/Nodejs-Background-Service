@@ -42,9 +42,24 @@ router.post('/add', function(req, res, next) {
 function findall(req, res, next) {
     var perPage = Number(req.query.perPage ? req.query.perPage : 5);
     var page = Number(req.query.page ? req.query.page : 1);
+    var sortby = req.query.sortby ? req.query.sortby : CONSTANTS.IMAGES_SORT_BY.RANDOM;
+
+    var sortObj = "id";
+
+    if(CONSTANTS.IMAGES_SORT_BY.DOWNLOAD == sortby){
+        sortObj = "-num_down";
+    }else if(CONSTANTS.IMAGES_SORT_BY.FAVORITE == sortby){
+        sortObj = "-num_favorite";
+    }else if(CONSTANTS.IMAGES_SORT_BY.PREVIEW == sortby){
+        sortObj = "-num_prev";
+    }else{
+        sortObj = "id";
+    }
+
+    console.log(sortby + "====" + sortObj);
 
     var responseDto = new ResponseDto();
-    Image.find({}).limit(perPage).skip(perPage * (page-1)).exec(function (err, rows) {
+    Image.find({}).limit(perPage).sort(sortObj).skip(perPage * (page-1)).exec(function (err, rows) {
         if (err) {
             console.log("error find-by-id : " + err);
             responseDto.code = 1;
@@ -101,9 +116,22 @@ router.get('/find-by-category', function(req, res, next) {
     }else {
         var perPage = Number(req.query.perPage ? req.query.perPage : 5);
         var page = Number(req.query.page ? req.query.page : 1);
+        var sortby = req.query.sortby ? req.query.sortby : CONSTANTS.IMAGES_SORT_BY.RANDOM;
+
+        var sortObj = "id";
+
+        if(CONSTANTS.IMAGES_SORT_BY.DOWNLOAD == sortby){
+            sortObj = "-num_down";
+        }else if(CONSTANTS.IMAGES_SORT_BY.FAVORITE == sortby){
+            sortObj = "-num_favorite";
+        }else if(CONSTANTS.IMAGES_SORT_BY.PREVIEW == sortby){
+            sortObj = "-num_prev";
+        }else{
+            sortObj = "id";
+        }
 
         var responseDto = new ResponseDto();
-        Image.where("category_id", category_id).limit(perPage).skip(perPage * (page - 1)).exec(function (err, rows, wee) {
+        Image.where("category_id", category_id).limit(perPage).skip(perPage * (page - 1)).sort(sortObj).exec(function (err, rows, wee) {
             if (err) {
                 console.log("error find-by-id : " + err);
                 responseDto.code = 1;

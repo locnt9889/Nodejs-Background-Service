@@ -8,6 +8,13 @@ exports.EXECUTE_IMAGE_TYPE = {
     FAVORITE : "favorite"
 };
 
+exports.IMAGES_SORT_BY = {
+    PREVIEW : "preview",
+    DOWNLOAD : "download",
+    FAVORITE : "favorite",
+    RANDOM : "random"
+};
+
 exports.EXECUTE_IMAGE_ACTION = {
     ADD : "add",
     REMOVE : "remove"
