@@ -44,7 +44,7 @@ function findall(req, res, next) {
     var page = Number(req.query.page ? req.query.page : 1);
     var sortby = req.query.sortby ? req.query.sortby : CONSTANTS.IMAGES_SORT_BY.RANDOM;
 
-    var sortObj = "id";
+    var sortObj = "image";
 
     if(CONSTANTS.IMAGES_SORT_BY.DOWNLOAD == sortby){
         sortObj = "-num_down";
@@ -52,8 +52,10 @@ function findall(req, res, next) {
         sortObj = "-num_favorite";
     }else if(CONSTANTS.IMAGES_SORT_BY.PREVIEW == sortby){
         sortObj = "-num_prev";
+    }else if(CONSTANTS.IMAGES_SORT_BY.DATE == sortby){
+    sortObj = "-id";
     }else{
-        sortObj = "id";
+        sortObj = "image";
     }
 
     console.log(sortby + "====" + sortObj);

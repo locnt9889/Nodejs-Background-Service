@@ -12,6 +12,7 @@ exports.IMAGES_SORT_BY = {
     PREVIEW : "preview",
     DOWNLOAD : "download",
     FAVORITE : "favorite",
+    DATE : "date",
     RANDOM : "random"
 };
 
