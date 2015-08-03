@@ -1,6 +1,11 @@
 /**
  * Created by LocNT on 7/16/15.
  */
+var UPLOAD_FOLDER = "uploads";
+var PRE_IMAGE = "/images/";
+var PRE_THUMB = "/thumbs/";
+var MAX_SIZE_IMAGE = 3145728; //3Mb
+var MAX_SIZE_THUMB = 2097152; //2Mb
 
 var express = require('express');
 var router = express.Router();
@@ -13,15 +18,7 @@ var Image = require("../model/Image");
 var ImageDto = require("../dto/ImageDto");
 var ResponseDto = require("../dto/ResponseDto");
 
-/* GET Add Image */
-router.post('/add', function(req, res, next) {
-    var imageDto = new ImageDto();
-    imageDto.image = req.body.image ? req.body.image : "";
-    imageDto.thumb = req.body.thumb ? req.body.thumb : "";
-    imageDto.category_id = req.body.category_id ? req.body.category_id : 0
-
-    var image = new Image(imageDto);
-
+var addImage = function(req, res, image) {
     // save the user
     var responseDto = new ResponseDto();
     image.save(function (errsave, row) {
@@ -38,6 +35,18 @@ router.post('/add', function(req, res, next) {
         res.send(responseDto);
         //connection.disconnect();
     });
+}
+/* GET Add Image */
+router.post('/add', function(req, res, next) {
+    var imageDto = new ImageDto();
+    imageDto.image = req.body.image ? req.body.image : "";
+    imageDto.thumb = req.body.thumb ? req.body.thumb : "";
+    imageDto.category_id = req.body.category_id ? req.body.category_id : 0
+
+    var image = new Image(imageDto);
+
+    addImage(req, res, image);
+
 });
 function findall(req, res, next) {
     var perPage = Number(req.query.perPage ? req.query.perPage : 5);
@@ -216,5 +225,113 @@ router.get('/execute', function(req, res, next) {
         }
     });
 });
+/* GET action */
+router.get('/upload', function(req, res, next) {
+    res.sendfile("views/upload-client.html");
+});
+
+var Q = require("q");
+/* GET action */
+router.post('/upload-action', function(req, res, next) {
+    console.log("upload action");
+
+    upload_file(req, res);
+});
+
+var multiparty = require('multiparty');
+var fs = require('fs');
+
+function upload_file(req, res) {
+    var imageDto = new ImageDto();
+    imageDto.image = "";
+    imageDto.thumb = "";
+    imageDto.category_id = 0;
+
+    //var image = new Image(imageDto);
+
+    var form = new multiparty.Form();
+    form.parse(req, function(err, fields, files) {
+        var responseDto = new ResponseDto();
+        if(err){
+            responseDto.code = 1;
+            responseDto.error = err;
+            responseDto.message = "Loi parse form";
+            res.send(responseDto);
+            return;
+        }
+        if(files.imageFile.length == 0 || files.thumbFile.length == 0){
+            responseDto.code = 1;
+            responseDto.error = {'errcode' : "EMPTY"};
+            responseDto.message = "image or thumb is empty!";
+            res.send(responseDto);
+            return;
+        }
+        var categoryID = 0;
+        try{
+            categoryID = parseInt(fields.category_id[0]);
+        }catch(e){
+            console.log(e);
+        }
+        if(categoryID <= 0){
+            responseDto.code = 1;
+            responseDto.error = {'errcode' : "EMPTY"};
+            responseDto.message = "category id can not <= 0!";
+            res.send(responseDto);
+            return;
+        }
+        if(files.imageFile[0].size > MAX_SIZE_IMAGE ||  files.thumbFile[0].size > MAX_SIZE_THUMB){
+            responseDto.code = 1;
+            responseDto.error = {'errcode' : "LIMITED"};
+            responseDto.message = "image or thumb is limited size!";
+            res.send(responseDto);
+            return;
+        }
+
+        imageDto.category_id = categoryID;
+
+        console.log("ddd");
+        read_write_file(files.imageFile[0].originalFilename, files.imageFile[0].path, PRE_IMAGE).then(function(fullFilePath){
+            imageDto.image = fullFilePath;
+            read_write_file(files.thumbFile[0].originalFilename, files.imageFile[0].path, PRE_THUMB).then(function(fullFilePath){
+                imageDto.thumb = fullFilePath;
+                var image = new Image(imageDto);
+                addImage(req, res, image);
+            },function(){
+                responseDto.code = 1;
+                responseDto.error = {'errcode' : "WRITE/READ FILE"};
+                responseDto.message = "loi doc/ghi file thumb";
+                res.send(responseDto);
+                return;
+            });
+        },function(){
+            responseDto.code = 1;
+            responseDto.error = {'errcode' : "WRITE/READ FILE"};
+            responseDto.message = "loi doc/ghi file image";
+            res.send(responseDto);
+            return;
+        });
+    });
+}
+function read_write_file(fileName, filePath, preFolder){
+    var deferred = Q.defer();
+    fs.readFile(filePath, 'utf8', function (err,data) {
+        if (err) {
+            deferred.reject(err);
+        }else {
+            var currentDate = new Date();
+            var fullFilePath = UPLOAD_FOLDER + preFolder + currentDate.getTime() + fileName;
+            console.log("fullFilePath : " + fullFilePath);
+            fs.writeFile(fullFilePath, data, function (err) {
+                if (err) {
+                    deferred.reject(err);
+                }else{
+                    deferred.resolve(fullFilePath);
+                }
+            });
+        }
+    });
+    return deferred.promise;
+}
+
 
 module.exports = router;
