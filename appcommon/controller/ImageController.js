@@ -1,9 +1,9 @@
 /**
  * Created by LocNT on 7/16/15.
  */
-var UPLOAD_FOLDER = "uploads";
-var PRE_IMAGE = "/images/";
-var PRE_THUMB = "/thumbs/";
+var UPLOAD_FOLDER = "/var/www/nginxsite.com/public_html";
+var PRE_IMAGE = "/BackgroundStore/Images/";
+var PRE_THUMB = "/BackgroundStore/Thumbs/";
 var MAX_SIZE_IMAGE = 3145728; //3Mb
 var MAX_SIZE_THUMB = 2097152; //2Mb
 
@@ -319,13 +319,14 @@ function read_write_file(fileName, filePath, preFolder){
             deferred.reject(err);
         }else {
             var currentDate = new Date();
-            var fullFilePath = UPLOAD_FOLDER + preFolder + currentDate.getTime() + fileName;
+            var filepathSave = preFolder + currentDate.getTime() + fileName;
+            var fullFilePath = UPLOAD_FOLDER + filepathSave;
             console.log("fullFilePath : " + fullFilePath);
             fs.writeFile(fullFilePath, data, function (err) {
                 if (err) {
                     deferred.reject(err);
                 }else{
-                    deferred.resolve(fullFilePath);
+                    deferred.resolve(filepathSave);
                 }
             });
         }
