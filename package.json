@@ -17,6 +17,6 @@
     "multer": "^1.0.1",
     "multiparty": "^4.1.2",
     "q": "^1.4.1",
-    "serve-favicon": "~2.3.0",
+    "serve-favicon": "~2.3.0"
   }
 }
