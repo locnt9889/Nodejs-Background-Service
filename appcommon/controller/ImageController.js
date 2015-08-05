@@ -1,7 +1,8 @@
 /**
  * Created by LocNT on 7/16/15.
  */
-var UPLOAD_FOLDER = "/var/www/nginxsite.com/public_html";
+//var UPLOAD_FOLDER = "/var/www/nginxsite.com/public_html";
+var UPLOAD_FOLDER = "uploads";
 var PRE_IMAGE = "/BackgroundStore/Images/";
 var PRE_THUMB = "/BackgroundStore/Thumbs/";
 var MAX_SIZE_IMAGE = 3145728; //3Mb
@@ -231,6 +232,9 @@ router.get('/upload', function(req, res, next) {
 });
 
 var Q = require("q");
+var multiparty = require('multiparty');
+var fs = require('fs');
+var path = require("path");
 /* GET action */
 router.post('/upload-action', function(req, res, next) {
     console.log("upload action");
@@ -238,8 +242,37 @@ router.post('/upload-action', function(req, res, next) {
     upload_file(req, res);
 });
 
-var multiparty = require('multiparty');
-var fs = require('fs');
+/// Show files
+router.get('/imagefile/:file', function (req, res){
+    file = req.params.file;
+    var fullFile = UPLOAD_FOLDER + PRE_IMAGE + file;
+    fs.exists(fullFile, function(result){
+        if(result){
+            res.sendfile(path.resolve(fullFile));
+        }else{
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
+});
+
+/// Show files
+router.get('/thumbfile/:file', function (req, res){
+    var file = req.params.file;
+    //var img = fs.readFileSync(__dirname + "/" +UPLOAD_FOLDER + PRE_THUMB + file);
+    var fullFile = UPLOAD_FOLDER + PRE_THUMB + file;
+    fs.exists(fullFile, function(result){
+        if(result){
+            res.sendfile(path.resolve(fullFile));
+        }else{
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
+
+});
 
 function upload_file(req, res) {
     var imageDto = new ImageDto();
@@ -292,7 +325,7 @@ function upload_file(req, res) {
         console.log("ddd");
         read_write_file(files.imageFile[0].originalFilename, files.imageFile[0].path, PRE_IMAGE).then(function(fullFilePath){
             imageDto.image = fullFilePath;
-            read_write_file(files.thumbFile[0].originalFilename, files.imageFile[0].path, PRE_THUMB).then(function(fullFilePath){
+            read_write_file(files.thumbFile[0].originalFilename, files.thumbFile[0].path, PRE_THUMB).then(function(fullFilePath){
                 imageDto.thumb = fullFilePath;
                 var image = new Image(imageDto);
                 addImage(req, res, image);
@@ -314,13 +347,13 @@ function upload_file(req, res) {
 }
 function read_write_file(fileName, filePath, preFolder){
     var deferred = Q.defer();
-    fs.readFile(filePath, 'utf8', function (err,data) {
+    fs.readFile(filePath, function (err,data) {
         if (err) {
             deferred.reject(err);
         }else {
             var currentDate = new Date();
-            var filepathSave = preFolder + currentDate.getTime() + fileName;
-            var fullFilePath = UPLOAD_FOLDER + filepathSave;
+            var filepathSave = currentDate.getTime() + fileName;
+            var fullFilePath = UPLOAD_FOLDER + preFolder + filepathSave;
             console.log("fullFilePath : " + fullFilePath);
             fs.writeFile(fullFilePath, data, function (err) {
                 if (err) {
