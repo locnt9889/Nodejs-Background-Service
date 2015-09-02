@@ -11,7 +11,7 @@ var MONGO_INFO = {
 }
 
 //mongodb://<dbuser>:<dbpassword>@<dbhost>/<dbname>
-exports.//MONGO_URI = "mongodb://" + MONGO_INFO.DB_USERNAME + ":" + MONGO_INFO.DB_PASSWORD + "@" + MONGO_INFO.DB_HOST + "/" + MONGO_INFO.DB_NAME;
+//exports.MONGO_URI = "mongodb://" + MONGO_INFO.DB_USERNAME + ":" + MONGO_INFO.DB_PASSWORD + "@" + MONGO_INFO.DB_HOST + "/" + MONGO_INFO.DB_NAME;
 exports.MONGO_URI = "mongodb://" + MONGO_INFO.DB_HOST + "/" + MONGO_INFO.DB_NAME;
 exports.MONGO_TIMEOUT = 10000;
 exports.MONGO_OPTIONS = {
