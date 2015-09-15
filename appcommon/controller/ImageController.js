@@ -171,6 +171,48 @@ router.get('/find-by-category', function(req, res, next) {
     }
 });
 
+/* GET remove-by-category */
+router.get('/remove-by-category', function(req, res, next) {
+    var category_id = Number(req.query.category_id ? req.query.category_id : 0);
+
+    var responseDto = new ResponseDto();
+    Image.where("category_id", 100).remove().exec(function (err, result, wee) {
+        if (err) {
+            console.log("error remove-by-id : " + err);
+            responseDto.code = 1;
+            responseDto.error = err;
+            res.send(responseDto);
+        } else {
+            console.log("remove-by-category-id");
+            responseDto.code = 0;
+            responseDto.result = result;
+            res.send(responseDto);
+        }
+        //connection.disconnect();
+    });
+});
+
+/* GET remove-by-category */
+router.get('/remove-by-id', function(req, res, next) {
+    var id = Number(req.query.id ? req.query.id : 0);
+
+    var responseDto = new ResponseDto();
+    Image.where("id", 100).remove().exec(function (err, result, wee) {
+        if (err) {
+            console.log("error  remove-by-id : " + err);
+            responseDto.code = 1;
+            responseDto.error = err;
+            res.send(responseDto);
+        } else {
+            console.log("find-by-id");
+            responseDto.code = 0;
+            responseDto.result = result;
+            res.send(responseDto);
+        }
+        //connection.disconnect();
+    });
+});
+
 /* GET action */
 router.get('/execute', function(req, res, next) {
     var type = req.query.type ? req.query.type : "";
