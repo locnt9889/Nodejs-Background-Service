@@ -176,7 +176,7 @@ router.get('/remove-by-category', function(req, res, next) {
     var category_id = Number(req.query.category_id ? req.query.category_id : 0);
 
     var responseDto = new ResponseDto();
-    Image.where("category_id", 100).remove().exec(function (err, result, wee) {
+    Image.where("category_id", category_id).remove().exec(function (err, result, wee) {
         if (err) {
             console.log("error remove-by-id : " + err);
             responseDto.code = 1;
@@ -197,7 +197,7 @@ router.get('/remove-by-id', function(req, res, next) {
     var id = Number(req.query.id ? req.query.id : 0);
 
     var responseDto = new ResponseDto();
-    Image.where("id", 100).remove().exec(function (err, result, wee) {
+    Image.where("id", id).remove().exec(function (err, result, wee) {
         if (err) {
             console.log("error  remove-by-id : " + err);
             responseDto.code = 1;
